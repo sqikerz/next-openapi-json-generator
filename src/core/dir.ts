@@ -22,7 +22,7 @@ export async function getDirectoryItems(dirPath: string, targetFileName: string)
       const children = await getDirectoryItems(itemPath, targetFileName);
       collection.push(...children);
     } else if (itemName === targetFileName) {
-      collection.push(itemPath);
+      collection.push(itemPath.split(path.sep).join("/").replace(/^[A-Z]:/i, ""));
     }
   }
   return collection;

@@ -1,6 +1,6 @@
 {
-  "name": "@omer-x/next-openapi-json-generator",
-  "version": "1.0.2",
+  "name": "@spikers/next-openapi-json-generator",
+  "version": "1.0.3",
   "description": "a Next.js plugin to generate OpenAPI documentation from route handlers",
   "keywords": [
     "next.js",
@@ -12,20 +12,15 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/omermecitoglu/next-openapi-json-generator.git"
+    "url": "git+https://github.com/sqikerz/next-openapi-json-generator.git"
   },
   "bugs": {
-    "url": "https://github.com/omermecitoglu/next-openapi-json-generator/issues"
+    "url": "https://github.com/sqikerz/next-openapi-json-generator/issues"
   },
-  "homepage": "https://github.com/omermecitoglu/next-openapi-json-generator#readme",
+  "homepage": "https://github.com/sqikerz/next-openapi-json-generator#readme",
   "private": false,
   "publishConfig": {
     "access": "public"
-  },
-  "author": {
-    "name": "Omer Mecitoglu",
-    "email": "omer.mecitoglu@gmail.com",
-    "url": "https://omermecitoglu.github.io"
   },
   "license": "MIT",
   "type": "module",
