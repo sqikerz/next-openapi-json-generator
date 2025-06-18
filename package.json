@@ -40,7 +40,6 @@
     "build": "tsup"
   },
   "dependencies": {
-    "@omer-x/package-metadata": "^1.0.2",
     "minimatch": "^10.0.1",
     "typescript": "^5.7.2",
     "zod-to-json-schema": "^3.24.1"
