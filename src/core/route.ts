@@ -19,7 +19,10 @@ export function createRouteRecord(method: string, filePath: string, rootPath: st
 }
 
 export function bundlePaths(source: RouteRecord[], storedSchemas: Record<string, ZodType>) {
-  source.sort((a, b) => a.path.localeCompare(b.path));
+  source.sort((a, b) => {
+    const methodComparison = a.method.localeCompare(b.method);
+    return methodComparison !== 0 ? methodComparison : a.path.localeCompare(b.path);
+  });
   return source.reduce((collection, route) => ({
     ...collection,
     [route.path]: {
