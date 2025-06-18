@@ -4,6 +4,7 @@ export default [
   ...omer,
   {
     rules: {
+      "@stylistic/linebreak-style": "off",
     },
   },
 ];
