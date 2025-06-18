@@ -116,4 +116,98 @@ describe("maskWithReference", () => {
       ],
     });
   });
+
+  it("should process array schemas with a single item that references a stored schema", () => {
+    const schema: SchemaObject = {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          name: { type: "string" },
+        },
+        required: ["id", "name"],
+        additionalProperties: false,
+      },
+    };
+
+    const result = maskWithReference(schema, storedSchemas, true);
+
+    expect(result).toEqual({
+      type: "array",
+      items: {
+        $ref: "#/components/schemas/User",
+      },
+    });
+  });
+
+  it("should process array schemas with a single primitive item", () => {
+    const schema: SchemaObject = {
+      type: "array",
+      items: { type: "string" },
+    };
+
+    const result = maskWithReference(schema, storedSchemas, true);
+
+    expect(result).toEqual({
+      type: "array",
+      items: { type: "string" },
+    });
+  });
+
+  it("should handle array schema with undefined items", () => {
+    const schema: SchemaObject = {
+      type: "array",
+      items: { type: "null" },
+    };
+
+    const result = maskWithReference(schema, storedSchemas, true);
+
+    expect(result).toEqual({
+      type: "array",
+      items: { type: "null" },
+    });
+  });
+
+  it("should process array schema with non-array items that is not a reference to a stored schema", () => {
+    const schema: SchemaObject = {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          customField: { type: "string" },
+          anotherField: { type: "number" },
+        },
+        required: ["customField"],
+      },
+    };
+
+    const result = maskWithReference(schema, storedSchemas, true);
+
+    expect(result).toEqual({
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          customField: { type: "string" },
+          anotherField: { type: "number" },
+        },
+        required: ["customField"],
+      },
+    });
+  });
+
+  it("should handle object schema with undefined properties", () => {
+    const schema: SchemaObject = {
+      type: "object",
+      // properties is undefined here
+    };
+
+    const result = maskWithReference(schema, storedSchemas, true);
+
+    expect(result).toEqual({
+      type: "object",
+      properties: {},
+    });
+  });
 });

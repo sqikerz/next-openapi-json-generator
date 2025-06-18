@@ -380,4 +380,48 @@ describe("generateOpenApiSpec", () => {
 
     readFileSpy.mockRestore();
   });
+
+  it("should not clear unused schemas when clearUnusedSchemas is false", async () => {
+    const repoName = "omermecitoglu/example-user-service";
+    const branchName = "main";
+    const filePath = "src/app/users/route.ts";
+    const response = await fetch(`https://raw.githubusercontent.com/${repoName}/refs/heads/${branchName}/${filePath}`);
+    const example = await response.text();
+
+    jest.spyOn(next, "findAppFolderPath").mockResolvedValueOnce("/app");
+    (getDirectoryItems as jest.Mock<typeof getDirectoryItems>).mockResolvedValue([
+      "/app/test/route.ts",
+    ]);
+    (filterDirectoryItems as jest.Mock<typeof filterDirectoryItems>).mockReturnValue([
+      "/app/test/route.ts",
+    ]);
+
+    const testSchemas = {
+      ...schemas,
+      UnusedSchema: z.object({
+        unusedField: z.string(),
+      }),
+    };
+
+    const readFileSpy = jest.spyOn(fs, "readFile").mockImplementation(routePath => {
+      if (routePath === "/app/test/route.ts") {
+        return Promise.resolve(example);
+      }
+      throw new Error("Unexpected route path");
+    });
+
+    (getPackageMetadata as jest.Mock).mockReturnValue({
+      serviceName: "Test Service",
+      version: "1.0.0",
+    });
+
+    const result = await generateOpenApiSpec(testSchemas, { clearUnusedSchemas: false });
+
+    expect(result.components.schemas).toHaveProperty("UnusedSchema");
+    expect(Object.keys(result.components.schemas ?? {})).toContain("UserDTO");
+    expect(Object.keys(result.components.schemas ?? {})).toContain("NewUserDTO");
+    expect(Object.keys(result.components.schemas ?? {})).toContain("UnusedSchema");
+
+    readFileSpy.mockRestore();
+  });
 });
