@@ -67,7 +67,7 @@ describe("getRouteExports", () => {
 
   it("should handle errors during evaluation", async () => {
     const error = new Error("Eval error");
-    const evalSpy = jest.spyOn(global, "eval").mockImplementation(() => {
+    const FunctionSpy = jest.spyOn(global, "Function").mockImplementation(() => {
       throw error;
     });
     const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
@@ -77,7 +77,7 @@ describe("getRouteExports", () => {
     await expect(getRouteExports(mockRoutePath, mockRouteDefinerName, mockSchemas)).rejects.toThrow(error);
     expect(consoleLogSpy).toHaveBeenCalledWith(`An error occured while evaluating the route exports from "${mockRoutePath}"`);
 
-    evalSpy.mockRestore();
+    FunctionSpy.mockRestore();
     consoleLogSpy.mockRestore();
   });
 });

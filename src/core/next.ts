@@ -20,7 +20,19 @@ export async function findAppFolderPath() {
 
 function safeEval(code: string, routePath: string) {
   try {
-    return eval(code);
+    const fn = new Function("global", "require", `
+      const module = { exports: {} };
+      const exports = module.exports;
+      
+      const NextResponse = { json: () => ({}) };
+      const next = { server: { NextResponse } };
+      
+      ${code}
+      
+      return module.exports;
+    `);
+
+    return fn(global, require);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(`An error occured while evaluating the route exports from "${routePath}"`);
