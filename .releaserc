@@ -10,9 +10,5 @@
     "@semantic-release/release-notes-generator",
     "@semantic-release/npm",
     "@semantic-release/github"
-  ],
-  "lastRelease": {
-    "version": "1.0.3",
-    "gitHead": "HEAD"
-  }
+  ]
 }
