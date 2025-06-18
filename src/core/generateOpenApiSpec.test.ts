@@ -1,13 +1,11 @@
 import fs from "node:fs/promises";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import getPackageMetadata from "@omer-x/package-metadata";
 import z from "zod";
 import { filterDirectoryItems, getDirectoryItems } from "./dir";
 import generateOpenApiSpec from "./generateOpenApiSpec";
 import * as next from "./next";
 
 jest.mock("./dir");
-jest.mock("@omer-x/package-metadata");
 
 describe("generateOpenApiSpec", () => {
   const schemas = {
@@ -58,17 +56,13 @@ describe("generateOpenApiSpec", () => {
       }
       // do nothing
     });
-    (getPackageMetadata as jest.Mock).mockReturnValue({
-      serviceName: "Test Service",
-      version: "1.0.0",
-    });
 
     const result = await generateOpenApiSpec(schemas);
 
     expect(result).toEqual({
       openapi: "3.1.0",
       info: {
-        title: "Test Service",
+        title: "API Documentation",
         version: "1.0.0",
       },
       paths: {
@@ -159,7 +153,7 @@ describe("generateOpenApiSpec", () => {
                 description: "Email already exists",
               },
               500: {
-
+                content: undefined,
                 description: "Internal Server Error",
               },
             },
@@ -199,7 +193,10 @@ describe("generateOpenApiSpec", () => {
             required: ["name"],
           },
         },
+        securitySchemes: undefined,
       },
+      servers: undefined,
+      security: undefined,
       tags: [],
     });
 
@@ -233,17 +230,13 @@ describe("generateOpenApiSpec", () => {
       }
       // do nothing
     });
-    (getPackageMetadata as jest.Mock).mockReturnValue({
-      serviceName: "Test Service",
-      version: "1.0.0",
-    });
 
     const result = await generateOpenApiSpec(schemas, { rootPath: "/api/v1" });
 
     expect(result).toEqual({
       openapi: "3.1.0",
       info: {
-        title: "Test Service",
+        title: "API Documentation",
         version: "1.0.0",
       },
       paths: {
@@ -334,7 +327,7 @@ describe("generateOpenApiSpec", () => {
                 description: "Email already exists",
               },
               500: {
-
+                content: undefined,
                 description: "Internal Server Error",
               },
             },
@@ -374,7 +367,10 @@ describe("generateOpenApiSpec", () => {
             required: ["name"],
           },
         },
+        securitySchemes: undefined,
       },
+      servers: undefined,
+      security: undefined,
       tags: [],
     });
 
@@ -408,11 +404,6 @@ describe("generateOpenApiSpec", () => {
         return Promise.resolve(example);
       }
       throw new Error("Unexpected route path");
-    });
-
-    (getPackageMetadata as jest.Mock).mockReturnValue({
-      serviceName: "Test Service",
-      version: "1.0.0",
     });
 
     const result = await generateOpenApiSpec(testSchemas, { clearUnusedSchemas: false });
