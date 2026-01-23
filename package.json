@@ -1,6 +1,6 @@
 {
   "name": "@spikers/next-openapi-json-generator",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "a Next.js plugin to generate OpenAPI documentation from route handlers",
   "keywords": [
     "next.js",
@@ -44,7 +44,7 @@
   },
   "peerDependencies": {
     "@omer-x/json-schema-types": "^1",
-    "@omer-x/next-openapi-route-handler": "^2",
+    "@spikers/next-openapi-route-handler": "^2",
     "@omer-x/openapi-types": "^1",
     "typescript": "^5",
     "zod": "^4"

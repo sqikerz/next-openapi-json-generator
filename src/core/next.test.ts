@@ -62,16 +62,13 @@ describe("getRouteExports", () => {
   });
 
   it("should handle errors during evaluation", async () => {
-    const error = new Error("Eval error");
-    const evalSpy = vi.spyOn(global, "eval").mockImplementation(() => {
-      throw error;
-    });
+    const readFileSpy = vi.spyOn(fs, "readFile").mockResolvedValueOnce("throw new Error('Intentional error');");
     const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => { /* do nothing */ });
 
-    await expect(getRouteExports(mockRoutePath, mockRouteDefinerName, mockSchemas)).rejects.toThrow(error);
+    await expect(getRouteExports(mockRoutePath, mockRouteDefinerName, mockSchemas)).rejects.toThrow("Intentional error");
     expect(consoleLogSpy).toHaveBeenCalledWith(`An error occured while evaluating the route exports from "${mockRoutePath}"`);
 
-    evalSpy.mockRestore();
+    readFileSpy.mockRestore();
     consoleLogSpy.mockRestore();
   });
 });

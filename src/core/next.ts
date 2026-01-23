@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { defineRoute } from "@omer-x/next-openapi-route-handler";
+import { defineRoute } from "@spikers/next-openapi-route-handler";
 import { z } from "zod";
 import { directoryExists } from "./dir";
 import injectSchemas from "./injectSchemas";
@@ -22,10 +22,15 @@ export async function findAppFolderPath() {
 
 async function safeEval(code: string, routePath: string) {
   try {
-    if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
-      return eval(code);
-    }
-    return await import(/* webpackIgnore: true */ `data:text/javascript,${encodeURIComponent(code)}`);
+    // Set up CommonJS environment for eval
+    const exports: Record<string, unknown> = {};
+    const module = { exports };
+    // Mock require function that returns empty objects for any imports
+    const require = () => ({});
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const fn = new Function("exports", "module", "require", code);
+    fn(exports, module, require);
+    return module.exports;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(`An error occured while evaluating the route exports from "${routePath}"`);
@@ -45,8 +50,8 @@ async function getModuleTranspiler() {
 export async function getRouteExports(routePath: string, routeDefinerName: string, schemas: Record<string, unknown>) {
   const rawCode = await fs.readFile(routePath, "utf-8");
   const middlewareName = detectMiddlewareName(rawCode);
-  const isCommonJS = typeof module !== "undefined" && typeof module.exports !== "undefined";
-  const code = transpile(isCommonJS, rawCode, middlewareName, await getModuleTranspiler());
+  // Always use CommonJS transpilation with eval for reliable cross-runtime behavior
+  const code = transpile(true, rawCode, middlewareName, await getModuleTranspiler());
   const fixedCode = Object.keys(schemas).reduce(injectSchemas, code);
   (global as Record<string, unknown>)[routeDefinerName] = defineRoute;
   (global as Record<string, unknown>).z = z;

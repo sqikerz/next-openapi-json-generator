@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { directoryExists, filterDirectoryItems, getDirectoryItems } from "./dir";
 
@@ -20,7 +21,7 @@ describe("directoryExists", () => {
 
 describe("getDirectoryItems", () => {
   it("should return an array of file paths matching the target file name", async () => {
-    const dirPath = "/projects/app/src/app";
+    const dirPath = path.resolve("/projects/app/src/app");
     const targetFileName = "route.ts";
     vi.spyOn(fs, "readdir").mockResolvedValueOnce(["users", "messages"] as never);
     vi.spyOn(fs, "stat").mockResolvedValueOnce({ isDirectory: () => true } as never);
@@ -32,13 +33,13 @@ describe("getDirectoryItems", () => {
 
     const result = await getDirectoryItems(dirPath, targetFileName);
     expect(result).toStrictEqual([
-      "/projects/app/src/app/users/route.ts",
-      "/projects/app/src/app/messages/route.ts",
+      path.resolve("/projects/app/src/app/users/route.ts"),
+      path.resolve("/projects/app/src/app/messages/route.ts"),
     ]);
   });
 
   it("should return an empty array if no files match the target file name", async () => {
-    const dirPath = "/projects/app/src/app";
+    const dirPath = path.resolve("/projects/app/src/app");
     const targetFileName = "route.ts";
     vi.spyOn(fs, "readdir").mockResolvedValueOnce(["users", "messages"] as never);
     vi.spyOn(fs, "stat").mockResolvedValueOnce({ isDirectory: () => true } as never);
