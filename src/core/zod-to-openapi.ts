@@ -1,5 +1,5 @@
 import { type ZodObject, type ZodType, z } from "zod";
-import type { SchemaObject } from "@omer-x/openapi-types/schema";
+import { SchemaObject } from "@omer-x/json-schema-types";
 
 function fixSchema(schema: ZodType<unknown>): ZodType<unknown> {
   if ("unwrap" in schema && typeof schema.unwrap === "function") {
@@ -8,6 +8,7 @@ function fixSchema(schema: ZodType<unknown>): ZodType<unknown> {
       case "optional": return fixSchema(schema.unwrap()).optional();
       case "readonly": return fixSchema(schema.unwrap()).readonly();
       case "array": return fixSchema(schema.unwrap()).array();
+      case "nonoptional": return fixSchema(schema.unwrap());
       default: throw new Error(`${schema._zod.def.type} type is not covered in fixSchema (@omer-x/next-openapi-json-generator")`);
     }
   }
