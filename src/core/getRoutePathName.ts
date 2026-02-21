@@ -6,5 +6,5 @@ export default function getRoutePathName(filePath: string, rootPath: string) {
     .replaceAll("[", "{")
     .replaceAll("]", "}")
     .replaceAll("\\", "/")
-    .replaceAll(/\([^)]*\)/g, "");
+    .replaceAll(/\([^)]*\)\//g, "/");
 }
