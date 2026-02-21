@@ -1,7 +1,7 @@
+import type { SchemaObject } from "@omer-x/openapi-types/schema";
 import { describe, expect, it } from "vitest";
 import z from "zod";
 import { bundleSchemas } from "./schema";
-import type { SchemaObject } from "@omer-x/openapi-types/schema";
 
 describe("bundleSchemas", () => {
   const mockSchemas = {

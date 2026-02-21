@@ -1,12 +1,12 @@
+import type { OperationObject } from "@omer-x/openapi-types/operation";
+import { defineRoute } from "@spikers/next-openapi-route-handler";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { defineRoute } from "@spikers/next-openapi-route-handler";
 import { z } from "zod";
 import { directoryExists } from "./dir";
 import injectSchemas from "./injectSchemas";
 import { detectMiddlewareName } from "./middleware";
 import { transpile } from "./transpile";
-import type { OperationObject } from "@omer-x/openapi-types/operation";
 
 export async function findAppFolderPath() {
   const inSrc = path.resolve(process.cwd(), "src", "app");
@@ -27,13 +27,15 @@ async function safeEval(code: string, routePath: string) {
     const module = { exports };
     // Mock require function that returns empty objects for any imports
     const require = () => ({});
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+
     const fn = new Function("exports", "module", "require", code);
     fn(exports, module, require);
     return module.exports;
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(`An error occured while evaluating the route exports from "${routePath}"`);
+    console.log(
+      `An error occured while evaluating the route exports from "${routePath}"`,
+    );
     throw error;
   }
 }
@@ -43,15 +45,26 @@ async function getModuleTranspiler() {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require(/* webpackIgnore: true */ "typescript").transpileModule;
   }
-  const { transpileModule } = await import(/* webpackIgnore: true */ "typescript");
+  const { transpileModule } = await import(
+    /* webpackIgnore: true */ "typescript"
+  );
   return transpileModule;
 }
 
-export async function getRouteExports(routePath: string, routeDefinerName: string, schemas: Record<string, unknown>) {
+export async function getRouteExports(
+  routePath: string,
+  routeDefinerName: string,
+  schemas: Record<string, unknown>,
+) {
   const rawCode = await fs.readFile(routePath, "utf-8");
   const middlewareName = detectMiddlewareName(rawCode);
   // Always use CommonJS transpilation with eval for reliable cross-runtime behavior
-  const code = transpile(true, rawCode, middlewareName, await getModuleTranspiler());
+  const code = transpile(
+    true,
+    rawCode,
+    middlewareName,
+    await getModuleTranspiler(),
+  );
   const fixedCode = Object.keys(schemas).reduce(injectSchemas, code);
   (global as Record<string, unknown>)[routeDefinerName] = defineRoute;
   (global as Record<string, unknown>).z = z;

@@ -31,14 +31,18 @@ describe("generateOpenApiSpec", () => {
   it("should throw an error if not a Next.js application", async () => {
     vi.spyOn(next, "findAppFolderPath").mockResolvedValueOnce(null);
 
-    await expect(generateOpenApiSpec(schemas)).rejects.toThrow("This is not a Next.js application!");
+    await expect(generateOpenApiSpec(schemas)).rejects.toThrow(
+      "This is not a Next.js application!",
+    );
   });
 
   it("should generate OpenAPI spec correctly", async () => {
     const repoName = "omermecitoglu/example-user-service";
     const branchName = "main";
     const filePath = "src/app/users/route.ts";
-    const response = await fetch(`https://raw.githubusercontent.com/${repoName}/refs/heads/${branchName}/${filePath}`);
+    const response = await fetch(
+      `https://raw.githubusercontent.com/${repoName}/refs/heads/${branchName}/${filePath}`,
+    );
     const example = await response.text();
 
     vi.spyOn(next, "findAppFolderPath").mockResolvedValueOnce("/app");
@@ -50,17 +54,21 @@ describe("generateOpenApiSpec", () => {
       "/app/test/route.ts",
       "/app/api/users/route.ts",
     ]);
-    const readFileSpy = vi.spyOn(fs, "readFile").mockImplementation(routePath => {
-      switch (routePath) {
-        case "/app/test/route.ts":
-          return Promise.resolve(example);
-        case "/app/api/users/route.ts":
-          return Promise.resolve("export async function GET(request: Request) {}");
-        default:
-          throw new Error("Unexpected route path");
-      }
-      // do nothing
-    });
+    const readFileSpy = vi
+      .spyOn(fs, "readFile")
+      .mockImplementation((routePath) => {
+        switch (routePath) {
+          case "/app/test/route.ts":
+            return Promise.resolve(example);
+          case "/app/api/users/route.ts":
+            return Promise.resolve(
+              "export async function GET(request: Request) {}",
+            );
+          default:
+            throw new Error("Unexpected route path");
+        }
+        // do nothing
+      });
 
     const result = await generateOpenApiSpec(schemas);
 
@@ -86,10 +94,7 @@ describe("generateOpenApiSpec", () => {
                   default: [],
                   description: "List of the column names",
                   items: {
-                    enum: [
-                      "id",
-                      "name",
-                    ],
+                    enum: ["id", "name"],
                     type: "string",
                   },
                   type: "array",
@@ -117,9 +122,7 @@ describe("generateOpenApiSpec", () => {
                 description: "Internal Server Error",
               },
             },
-            tags: [
-              "Users",
-            ],
+            tags: ["Users"],
           },
           post: {
             description: "Create a new user",
@@ -152,14 +155,11 @@ describe("generateOpenApiSpec", () => {
                 description: "Email already exists",
               },
               500: {
-
                 description: "Internal Server Error",
               },
             },
             summary: "Create user",
-            tags: [
-              "Users",
-            ],
+            tags: ["Users"],
           },
         },
       },
@@ -205,7 +205,9 @@ describe("generateOpenApiSpec", () => {
     const repoName = "omermecitoglu/example-user-service";
     const branchName = "main";
     const filePath = "src/app/users/route.ts";
-    const response = await fetch(`https://raw.githubusercontent.com/${repoName}/refs/heads/${branchName}/${filePath}`);
+    const response = await fetch(
+      `https://raw.githubusercontent.com/${repoName}/refs/heads/${branchName}/${filePath}`,
+    );
     const example = await response.text();
 
     vi.spyOn(next, "findAppFolderPath").mockResolvedValueOnce("/app");
@@ -217,17 +219,21 @@ describe("generateOpenApiSpec", () => {
       "/app/api/v1/test/route.ts",
       "/app/api/v1/users/route.ts",
     ]);
-    const readFileSpy = vi.spyOn(fs, "readFile").mockImplementation(routePath => {
-      switch (routePath) {
-        case "/app/api/v1/test/route.ts":
-          return Promise.resolve(example);
-        case "/app/api/v1/users/route.ts":
-          return Promise.resolve("export async function GET(request: Request) {}");
-        default:
-          throw new Error("Unexpected route path");
-      }
-      // do nothing
-    });
+    const readFileSpy = vi
+      .spyOn(fs, "readFile")
+      .mockImplementation((routePath) => {
+        switch (routePath) {
+          case "/app/api/v1/test/route.ts":
+            return Promise.resolve(example);
+          case "/app/api/v1/users/route.ts":
+            return Promise.resolve(
+              "export async function GET(request: Request) {}",
+            );
+          default:
+            throw new Error("Unexpected route path");
+        }
+        // do nothing
+      });
 
     const result = await generateOpenApiSpec(schemas, { rootPath: "/api/v1" });
 
@@ -253,10 +259,7 @@ describe("generateOpenApiSpec", () => {
                   default: [],
                   description: "List of the column names",
                   items: {
-                    enum: [
-                      "id",
-                      "name",
-                    ],
+                    enum: ["id", "name"],
                     type: "string",
                   },
                   type: "array",
@@ -284,9 +287,7 @@ describe("generateOpenApiSpec", () => {
                 description: "Internal Server Error",
               },
             },
-            tags: [
-              "Users",
-            ],
+            tags: ["Users"],
           },
           post: {
             description: "Create a new user",
@@ -319,14 +320,11 @@ describe("generateOpenApiSpec", () => {
                 description: "Email already exists",
               },
               500: {
-
                 description: "Internal Server Error",
               },
             },
             summary: "Create user",
-            tags: [
-              "Users",
-            ],
+            tags: ["Users"],
           },
         },
       },

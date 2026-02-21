@@ -1,8 +1,7 @@
+import type { SchemaObject } from "@omer-x/openapi-types/schema";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import z, { type ZodType } from "zod";
 import maskWithReference from "./mask";
-import type { SchemaObject } from "@omer-x/openapi-types/schema";
-
 
 describe("maskWithReference", () => {
   const storedSchemas: Record<string, ZodType> = {
@@ -43,33 +42,21 @@ describe("maskWithReference", () => {
 
   it("should process oneOf schemas", () => {
     const schema = {
-      oneOf: [
-        { type: "string" },
-        { type: "number" },
-      ],
+      oneOf: [{ type: "string" }, { type: "number" }],
     } as unknown as SchemaObject;
     const result = maskWithReference(schema, storedSchemas, true);
     expect(result).toEqual({
-      oneOf: [
-        { type: "string" },
-        { type: "number" },
-      ],
+      oneOf: [{ type: "string" }, { type: "number" }],
     });
   });
 
   it("should process anyOf schemas", () => {
     const schema = {
-      anyOf: [
-        { type: "string" },
-        { type: "number" },
-      ],
+      anyOf: [{ type: "string" }, { type: "number" }],
     } as unknown as SchemaObject;
     const result = maskWithReference(schema, storedSchemas, true);
     expect(result).toEqual({
-      anyOf: [
-        { type: "string" },
-        { type: "number" },
-      ],
+      anyOf: [{ type: "string" }, { type: "number" }],
     });
   });
 
@@ -106,18 +93,12 @@ describe("maskWithReference", () => {
   it("should process array schemas with multiple items", () => {
     const schema: SchemaObject = {
       type: "array",
-      items: [
-        { type: "string" },
-        { type: "number" },
-      ],
+      items: [{ type: "string" }, { type: "number" }],
     };
     const result = maskWithReference(schema, storedSchemas, true);
     expect(result).toEqual({
       type: "array",
-      items: [
-        { type: "string" },
-        { type: "number" },
-      ],
+      items: [{ type: "string" }, { type: "number" }],
     });
   });
 });

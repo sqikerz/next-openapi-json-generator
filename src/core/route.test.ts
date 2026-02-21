@@ -1,12 +1,13 @@
+import type { OperationObject } from "@omer-x/openapi-types/operation";
 import { describe, expect, it } from "vitest";
 import { type ZodType, z } from "zod";
 import { bundlePaths, createRouteRecord } from "./route";
-import type { OperationObject } from "@omer-x/openapi-types/operation";
 
 describe("createRouteRecord", () => {
   it("should create a route record with the correct method, path, and apiData", () => {
     const method = "GET";
-    const filePath = "/home/omer/Projects/next-openapi-json-generator/src/core/[id]/route.ts";
+    const filePath =
+      "/home/omer/Projects/next-openapi-json-generator/src/core/[id]/route.ts";
     const rootPath = "/home/omer/Projects/next-openapi-json-generator/src/core";
     const apiData: OperationObject = { summary: "Get item by ID" };
 
@@ -125,7 +126,8 @@ describe("bundlePaths", () => {
                       email: {
                         type: "string",
                         format: "email",
-                        pattern: "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                        pattern:
+                          "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
                       },
                     },
                     required: ["name", "email"],

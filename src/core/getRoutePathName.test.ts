@@ -14,7 +14,9 @@ describe("getRoutePathName", () => {
   });
 
   it("should replace backslashes with forward slashes", () => {
-    vi.spyOn(path, "dirname").mockReturnValueOnce("C:\\users\\omer\\Projects\\nextjs-app\\src\\app\\users\\[id]");
+    vi.spyOn(path, "dirname").mockReturnValueOnce(
+      "C:\\users\\omer\\Projects\\nextjs-app\\src\\app\\users\\[id]",
+    );
     vi.spyOn(path, "relative").mockReturnValueOnce("users\\[id]");
     const result = getRoutePathName(
       "C:\\users\\omer\\Projects\\nextjs-app\\src\\app\\users\\[id]\\route.ts",

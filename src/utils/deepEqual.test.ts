@@ -42,27 +42,58 @@ describe("deepEqual", () => {
   });
 
   it("should return false for functions and symbols", () => {
-    expect(deepEqual(() => null, () => null)).toBe(false);
+    expect(
+      deepEqual(
+        () => null,
+        () => null,
+      ),
+    ).toBe(false);
     expect(deepEqual(Symbol("a"), Symbol("a"))).toBe(false);
   });
 
   it("should return true for identical nested objects", () => {
     expect(deepEqual({ a: { b: 2 } }, { a: { b: 2 } })).toBe(true);
-    expect(deepEqual({ a: { b: { c: 3 } } }, { a: { b: { c: 3 } } })).toBe(true);
+    expect(deepEqual({ a: { b: { c: 3 } } }, { a: { b: { c: 3 } } })).toBe(
+      true,
+    );
   });
 
   it("should return false for different nested objects", () => {
     expect(deepEqual({ a: { b: 2 } }, { a: { b: 3 } })).toBe(false);
-    expect(deepEqual({ a: { b: { c: 3 } } }, { a: { b: { c: 4 } } })).toBe(false);
+    expect(deepEqual({ a: { b: { c: 3 } } }, { a: { b: { c: 4 } } })).toBe(
+      false,
+    );
   });
 
   it("should return true for identical nested arrays", () => {
     expect(deepEqual([1, [2, 3]], [1, [2, 3]])).toBe(true);
-    expect(deepEqual([[1, 2], [3, 4]], [[1, 2], [3, 4]])).toBe(true);
+    expect(
+      deepEqual(
+        [
+          [1, 2],
+          [3, 4],
+        ],
+        [
+          [1, 2],
+          [3, 4],
+        ],
+      ),
+    ).toBe(true);
   });
 
   it("should return false for different nested arrays", () => {
     expect(deepEqual([1, [2, 3]], [1, [2, 4]])).toBe(false);
-    expect(deepEqual([[1, 2], [3, 4]], [[1, 2], [3, 5]])).toBe(false);
+    expect(
+      deepEqual(
+        [
+          [1, 2],
+          [3, 4],
+        ],
+        [
+          [1, 2],
+          [3, 5],
+        ],
+      ),
+    ).toBe(false);
   });
 });

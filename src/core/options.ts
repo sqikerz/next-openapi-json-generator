@@ -14,7 +14,7 @@ export function verifyOptions(include: string[], exclude: string[]) {
     }
   }
   return {
-    include: include.filter(item => item.endsWith("/route.ts")),
-    exclude: exclude.filter(item => item.endsWith("/route.ts")),
+    include: include.filter((item) => item.endsWith("/route.ts")),
+    exclude: exclude.filter((item) => item.endsWith("/route.ts")),
   };
 }

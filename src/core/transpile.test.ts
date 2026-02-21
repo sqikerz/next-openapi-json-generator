@@ -11,11 +11,15 @@ describe("transpile", () => {
     expect(result).toContain("exports.PATCH = void 0;");
     expect(result).toContain("exports.DELETE = void 0;");
     // eslint-disable-next-line @stylistic/max-len
-    expect(result).toContain("module.exports = { GET: exports.GET, POST: exports.POST, PUT: exports.PUT, PATCH: exports.PATCH, DELETE: exports.DELETE };");
+    expect(result).toContain(
+      "module.exports = { GET: exports.GET, POST: exports.POST, PUT: exports.PUT, PATCH: exports.PATCH, DELETE: exports.DELETE };",
+    );
   });
 
   it("should inject a placeholder function for the middleware", () => {
     const result = transpile(true, "", "myAwesomeMiddleware", transpileModule);
-    expect(result).toContain("const myAwesomeMiddleware = (handler) => handler;");
+    expect(result).toContain(
+      "const myAwesomeMiddleware = (handler) => handler;",
+    );
   });
 });

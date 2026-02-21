@@ -8,7 +8,9 @@ describe("preserveStrings", () => {
   });
 
   it("should replace string values with placeholders and return the mapping of replacements", () => {
-    vi.spyOn(utils, "generateRandomString").mockReturnValueOnce("RANDOM_GENERATED_STRING");
+    vi.spyOn(utils, "generateRandomString").mockReturnValueOnce(
+      "RANDOM_GENERATED_STRING",
+    );
 
     const code = `
       console.log({
@@ -24,7 +26,8 @@ describe("preserveStrings", () => {
       });
     `,
       replacements: {
-        RANDOM_GENERATED_STRING: '"Initiates the process for resetting a user\'s password by sending a reset link to their registered email"',
+        RANDOM_GENERATED_STRING:
+          '"Initiates the process for resetting a user\'s password by sending a reset link to their registered email"',
       },
     });
   });

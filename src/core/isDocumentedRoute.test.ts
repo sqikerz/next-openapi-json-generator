@@ -4,7 +4,8 @@ import isDocumentedRoute from "./isDocumentedRoute";
 
 describe("isDocumentedRoute", () => {
   it("should return true if the file contains the target string", async () => {
-    const mockFileContent = "import { handler } from '@spikers/next-openapi-route-handler';";
+    const mockFileContent =
+      "import { handler } from '@spikers/next-openapi-route-handler';";
     vi.spyOn(fs, "readFile").mockResolvedValueOnce(mockFileContent);
 
     const result = await isDocumentedRoute("some/path/to/file.ts");

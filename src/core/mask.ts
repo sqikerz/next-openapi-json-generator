@@ -1,7 +1,7 @@
-import deepEqual from "~/utils/deepEqual";
-import convertToOpenAPI from "./zod-to-openapi";
 import type { SchemaObject } from "@omer-x/openapi-types/schema";
 import type { ZodType } from "zod";
+import deepEqual from "~/utils/deepEqual";
+import convertToOpenAPI from "./zod-to-openapi";
 
 export default function maskWithReference(
   schema: SchemaObject,
@@ -21,29 +21,34 @@ export default function maskWithReference(
   if (schema.oneOf) {
     return {
       ...schema,
-      oneOf: schema.oneOf.map(i => maskWithReference(i, storedSchemas, true)),
+      oneOf: schema.oneOf.map((i) => maskWithReference(i, storedSchemas, true)),
     };
   }
   if (schema.anyOf) {
     return {
       ...schema,
-      anyOf: schema.anyOf.map(i => maskWithReference(i, storedSchemas, true)),
+      anyOf: schema.anyOf.map((i) => maskWithReference(i, storedSchemas, true)),
     };
   }
   switch (schema.type) {
     case "object":
       return {
         ...schema,
-        properties: Object.entries(schema.properties ?? {}).reduce((props, [propName, prop]) => ({
-          ...props,
-          [propName]: maskWithReference(prop, storedSchemas, true),
-        }), {}),
+        properties: Object.entries(schema.properties ?? {}).reduce(
+          (props, [propName, prop]) => ({
+            ...props,
+            [propName]: maskWithReference(prop, storedSchemas, true),
+          }),
+          {},
+        ),
       };
     case "array":
       if (Array.isArray(schema.items)) {
         return {
           ...schema,
-          items: schema.items.map(i => maskWithReference(i, storedSchemas, true)),
+          items: schema.items.map((i) =>
+            maskWithReference(i, storedSchemas, true),
+          ),
         };
       }
       return {

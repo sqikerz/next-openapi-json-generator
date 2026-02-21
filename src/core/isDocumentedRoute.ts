@@ -8,7 +8,7 @@ const SUPPORTED_PACKAGE_NAMES = [
 export default async function isDocumentedRoute(routePath: string) {
   try {
     const rawCode = await fs.readFile(routePath, "utf-8");
-    return SUPPORTED_PACKAGE_NAMES.some(name => rawCode.includes(name));
+    return SUPPORTED_PACKAGE_NAMES.some((name) => rawCode.includes(name));
   } catch {
     return false;
   }
