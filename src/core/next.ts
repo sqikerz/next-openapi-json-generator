@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { defineRoute } from "@omer-x/next-openapi-route-handler";
+import { defineRoute } from "@spikers/next-openapi-route-handler";
 import { z } from "zod";
 import { directoryExists } from "./dir";
 import injectSchemas from "./injectSchemas";
@@ -23,10 +23,11 @@ export async function findAppFolderPath(): Promise<string | null> {
 
 async function safeEval(code: string, routePath: string): Promise<Record<string, { apiData?: OperationObject } | undefined>> {
   try {
-    if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
-      return eval(code);
-    }
-    return await import(/* webpackIgnore: true */ `data:text/javascript,${encodeURIComponent(code)}`);
+    const sandboxExports: Record<string, unknown> = {};
+    const sandboxModule = { exports: sandboxExports };
+    const sandboxRequire = () => ({});
+    new Function("exports", "module", "require", code)(sandboxExports, sandboxModule, sandboxRequire);
+    return sandboxModule.exports as Record<string, { apiData?: OperationObject } | undefined>;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(`An error occured while evaluating the route exports from "${routePath}"`);
@@ -50,8 +51,7 @@ export async function getRouteExports(
 ): Promise<Record<string, { apiData?: OperationObject } | undefined>> {
   const rawCode = await fs.readFile(routePath, "utf-8");
   const middlewareName = detectMiddlewareName(rawCode);
-  const isCommonJS = typeof module !== "undefined" && typeof module.exports !== "undefined";
-  const code = transpile(isCommonJS, rawCode, middlewareName, await getModuleTranspiler());
+  const code = transpile(true, rawCode, middlewareName, await getModuleTranspiler());
   const fixedCode = Object.keys(schemas).reduce(injectSchemas, code);
   (global as Record<string, unknown>)[routeDefinerName] = defineRoute;
   (global as Record<string, unknown>).z = z;
