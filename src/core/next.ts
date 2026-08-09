@@ -21,11 +21,11 @@ export async function findAppFolderPath(): Promise<string | null> {
   return null;
 }
 
-async function safeEval(code: string, routePath: string): Promise<Record<string, { apiData?: OperationObject } | undefined>> {
+function safeEval(code: string, routePath: string): Record<string, { apiData?: OperationObject } | undefined> {
   try {
     const sandboxExports: Record<string, unknown> = {};
     const sandboxModule = { exports: sandboxExports };
-    const sandboxRequire = () => ({});
+    const sandboxRequire = (): Record<string, never> => ({});
     new Function("exports", "module", "require", code)(sandboxExports, sandboxModule, sandboxRequire);
     return sandboxModule.exports as Record<string, { apiData?: OperationObject } | undefined>;
   } catch (error) {
@@ -56,7 +56,7 @@ export async function getRouteExports(
   (global as Record<string, unknown>)[routeDefinerName] = defineRoute;
   (global as Record<string, unknown>).z = z;
   (global as Record<string, unknown>).schemas = schemas;
-  const result = await safeEval(fixedCode, routePath);
+  const result = safeEval(fixedCode, routePath);
   delete (global as Record<string, unknown>).schemas;
   delete (global as Record<string, unknown>)[routeDefinerName];
   delete (global as Record<string, unknown>).z;
