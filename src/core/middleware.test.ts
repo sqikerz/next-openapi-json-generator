@@ -21,8 +21,7 @@ describe("detectMiddlewareName", () => {
   });
 
   it("should return the correct middleware name when there are multiple properties", () => {
-    const code =
-      "const config = { handler: requestHandler, middleware: loggingMiddleware, timeout: 5000 }";
+    const code = "const config = { handler: requestHandler, middleware: loggingMiddleware, timeout: 5000 }";
     const result = detectMiddlewareName(code);
     expect(result).toBe("loggingMiddleware");
   });

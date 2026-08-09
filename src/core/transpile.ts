@@ -1,16 +1,14 @@
-import type ts from "typescript";
 import removeImports from "~/utils/removeImports";
+import type ts from "typescript";
 
-function fixExportsInCommonJS(code: string) {
+function fixExportsInCommonJS(code: string): string {
   const validMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
-  const exportFixer1 = validMethods
-    .map((method) => `exports.${method} = void 0;\n`)
-    .join("\n");
-  const exportFixer2 = `module.exports = { ${validMethods.map((m) => `${m}: exports.${m}`).join(", ")} };`;
+  const exportFixer1 = validMethods.map(method => `exports.${method} = void 0;\n`).join("\n");
+  const exportFixer2 = `module.exports = { ${validMethods.map(m => `${m}: exports.${m}`).join(", ")} };`;
   return `${exportFixer1}\n${code}\n${exportFixer2}`;
 }
 
-function injectMiddlewareFixer(middlewareName: string) {
+function injectMiddlewareFixer(middlewareName: string): string {
   return `const ${middlewareName} = (handler) => handler;`;
 }
 
@@ -18,11 +16,8 @@ export function transpile(
   isCommonJS: boolean,
   rawCode: string,
   middlewareName: string | null,
-  transpileModule: (
-    input: string,
-    transpileOptions: ts.TranspileOptions,
-  ) => ts.TranspileOutput,
-) {
+  transpileModule: (input: string, transpileOptions: ts.TranspileOptions) => ts.TranspileOutput,
+): string {
   const parts = [
     middlewareName ? injectMiddlewareFixer(middlewareName) : "",
     removeImports(rawCode),

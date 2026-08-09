@@ -1,6 +1,9 @@
 /* eslint-disable no-console */
 
-export function verifyOptions(include: string[], exclude: string[]) {
+export function verifyOptions(include: string[], exclude: string[]): {
+  include: string[],
+  exclude: string[],
+} {
   if (process.env.NODE_ENV === "development") {
     for (const item of include) {
       if (!item.endsWith("/route.ts")) {
@@ -14,7 +17,7 @@ export function verifyOptions(include: string[], exclude: string[]) {
     }
   }
   return {
-    include: include.filter((item) => item.endsWith("/route.ts")),
-    exclude: exclude.filter((item) => item.endsWith("/route.ts")),
+    include: include.filter(item => item.endsWith("/route.ts")),
+    exclude: exclude.filter(item => item.endsWith("/route.ts")),
   };
 }

@@ -1,14 +1,15 @@
-import type { OperationObject } from "@omer-x/openapi-types/operation";
-import { defineRoute } from "@spikers/next-openapi-route-handler";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { defineRoute } from "@spikers/next-openapi-route-handler";
 import { z } from "zod";
 import { directoryExists } from "./dir";
 import injectSchemas from "./injectSchemas";
 import { detectMiddlewareName } from "./middleware";
 import { transpile } from "./transpile";
+import type { OperationObject } from "@omer-x/openapi-types/operation";
+import type { TranspileOptions, TranspileOutput } from "typescript";
 
-export async function findAppFolderPath() {
+export async function findAppFolderPath(): Promise<string | null> {
   const inSrc = path.resolve(process.cwd(), "src", "app");
   if (await directoryExists(inSrc)) {
     return inSrc;
@@ -20,34 +21,26 @@ export async function findAppFolderPath() {
   return null;
 }
 
-async function safeEval(code: string, routePath: string) {
+async function safeEval(code: string, routePath: string): Promise<Record<string, { apiData?: OperationObject } | undefined>> {
   try {
-    // Set up CommonJS environment for eval
-    const exports: Record<string, unknown> = {};
-    const module = { exports };
-    // Mock require function that returns empty objects for any imports
-    const require = () => ({});
-
-    const fn = new Function("exports", "module", "require", code);
-    fn(exports, module, require);
-    return module.exports;
+    const sandboxExports: Record<string, unknown> = {};
+    const sandboxModule = { exports: sandboxExports };
+    const sandboxRequire = () => ({});
+    new Function("exports", "module", "require", code)(sandboxExports, sandboxModule, sandboxRequire);
+    return sandboxModule.exports as Record<string, { apiData?: OperationObject } | undefined>;
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(
-      `An error occured while evaluating the route exports from "${routePath}"`,
-    );
+    console.log(`An error occured while evaluating the route exports from "${routePath}"`);
     throw error;
   }
 }
 
-async function getModuleTranspiler() {
+async function getModuleTranspiler(): Promise<(input: string, transpileOptions: TranspileOptions) => TranspileOutput> {
   if (typeof require !== "undefined" && typeof exports !== "undefined") {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require(/* webpackIgnore: true */ "typescript").transpileModule;
   }
-  const { transpileModule } = await import(
-    /* webpackIgnore: true */ "typescript"
-  );
+  const { transpileModule } = await import(/* webpackIgnore: true */ "typescript");
   return transpileModule;
 }
 
@@ -55,16 +48,10 @@ export async function getRouteExports(
   routePath: string,
   routeDefinerName: string,
   schemas: Record<string, unknown>,
-) {
+): Promise<Record<string, { apiData?: OperationObject } | undefined>> {
   const rawCode = await fs.readFile(routePath, "utf-8");
   const middlewareName = detectMiddlewareName(rawCode);
-  // Always use CommonJS transpilation with eval for reliable cross-runtime behavior
-  const code = transpile(
-    true,
-    rawCode,
-    middlewareName,
-    await getModuleTranspiler(),
-  );
+  const code = transpile(true, rawCode, middlewareName, await getModuleTranspiler());
   const fixedCode = Object.keys(schemas).reduce(injectSchemas, code);
   (global as Record<string, unknown>)[routeDefinerName] = defineRoute;
   (global as Record<string, unknown>).z = z;
@@ -73,5 +60,5 @@ export async function getRouteExports(
   delete (global as Record<string, unknown>).schemas;
   delete (global as Record<string, unknown>)[routeDefinerName];
   delete (global as Record<string, unknown>).z;
-  return result as Record<string, { apiData?: OperationObject } | undefined>;
+  return result;
 }

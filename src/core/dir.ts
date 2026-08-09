@@ -1,9 +1,9 @@
 import { constants } from "fs";
 import fs from "fs/promises";
-import { Minimatch } from "minimatch";
 import path from "node:path";
+import { Minimatch } from "minimatch";
 
-export async function directoryExists(dirPath: string) {
+export async function directoryExists(dirPath: string): Promise<boolean> {
   try {
     await fs.access(dirPath, constants.F_OK);
     return true;
@@ -12,10 +12,7 @@ export async function directoryExists(dirPath: string) {
   }
 }
 
-export async function getDirectoryItems(
-  dirPath: string,
-  targetFileName: string,
-) {
+export async function getDirectoryItems(dirPath: string, targetFileName: string): Promise<string[]> {
   const collection: string[] = [];
   const files = await fs.readdir(dirPath);
   for (const itemName of files) {
@@ -31,23 +28,14 @@ export async function getDirectoryItems(
   return collection;
 }
 
-export function filterDirectoryItems(
-  rootPath: string,
-  items: string[],
-  include: string[],
-  exclude: string[],
-) {
-  const includedPatterns = include.map((pattern) => new Minimatch(pattern));
-  const excludedPatterns = exclude.map((pattern) => new Minimatch(pattern));
+export function filterDirectoryItems(rootPath: string, items: string[], include: string[], exclude: string[]): string[] {
+  const includedPatterns = include.map(pattern => new Minimatch(pattern));
+  const excludedPatterns = exclude.map(pattern => new Minimatch(pattern));
 
-  return items.filter((item) => {
+  return items.filter(item => {
     const relativePath = path.relative(rootPath, item);
-    const isIncluded = includedPatterns.some((pattern) =>
-      pattern.match(relativePath),
-    );
-    const isExcluded = excludedPatterns.some((pattern) =>
-      pattern.match(relativePath),
-    );
+    const isIncluded = includedPatterns.some(pattern => pattern.match(relativePath));
+    const isExcluded = excludedPatterns.some(pattern => pattern.match(relativePath));
     return (isIncluded || !include.length) && !isExcluded;
   });
 }

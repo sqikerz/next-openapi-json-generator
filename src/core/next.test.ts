@@ -13,17 +13,13 @@ describe("findAppFolderPath", () => {
   });
 
   it("should return app if src/app does not exist but app does", async () => {
-    vi.spyOn(utils, "directoryExists")
-      .mockResolvedValueOnce(false)
-      .mockResolvedValueOnce(true);
+    vi.spyOn(utils, "directoryExists").mockResolvedValueOnce(false).mockResolvedValueOnce(true);
     const result = await findAppFolderPath();
     expect(result).toBe(path.resolve(process.cwd(), "app"));
   });
 
   it("should return null if neither src/app nor app exists", async () => {
-    vi.spyOn(utils, "directoryExists")
-      .mockResolvedValueOnce(false)
-      .mockResolvedValueOnce(false);
+    vi.spyOn(utils, "directoryExists").mockResolvedValueOnce(false).mockResolvedValueOnce(false);
     const result = await findAppFolderPath();
     expect(result).toBeNull();
   });
@@ -50,7 +46,7 @@ describe("getRouteExports", () => {
       const branchName = "main";
       const filePath = "src/app/users/route.ts";
       const url = `https://raw.githubusercontent.com/${repoName}/refs/heads/${branchName}/${filePath}`;
-      return fetch(url).then((response) => response.text());
+      return fetch(url).then(response => response.text());
     });
   });
 
@@ -60,33 +56,21 @@ describe("getRouteExports", () => {
   });
 
   it("should transpile the content", async () => {
-    const exportedRoutes = await getRouteExports(
-      mockRoutePath,
-      mockRouteDefinerName,
-      mockSchemas,
-    );
-    const validRoutes = Object.keys(exportedRoutes).filter(
-      (key) => !!exportedRoutes[key],
-    );
+    const exportedRoutes = await getRouteExports(mockRoutePath, mockRouteDefinerName, mockSchemas);
+    const validRoutes = Object.keys(exportedRoutes).filter(key => !!exportedRoutes[key]);
     expect(validRoutes).toStrictEqual(["GET", "POST"]);
   });
 
   it("should handle errors during evaluation", async () => {
-    const readFileSpy = vi
-      .spyOn(fs, "readFile")
-      .mockResolvedValueOnce("throw new Error('Intentional error');");
-    const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {
-      /* do nothing */
-    });
+    vi.spyOn(fs, "readFile").mockResolvedValueOnce([
+      "import defineRoute from \"@omer-x/next-openapi-route-handler\";",
+      "export const GET = (() => { throw new Error(\"Eval error\"); })();",
+    ].join("\n"));
+    const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => { /* do nothing */ });
 
-    await expect(
-      getRouteExports(mockRoutePath, mockRouteDefinerName, mockSchemas),
-    ).rejects.toThrow("Intentional error");
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      `An error occured while evaluating the route exports from "${mockRoutePath}"`,
-    );
+    await expect(getRouteExports(mockRoutePath, mockRouteDefinerName, mockSchemas)).rejects.toThrow("Eval error");
+    expect(consoleLogSpy).toHaveBeenCalledWith(`An error occured while evaluating the route exports from "${mockRoutePath}"`);
 
-    readFileSpy.mockRestore();
     consoleLogSpy.mockRestore();
   });
 });
